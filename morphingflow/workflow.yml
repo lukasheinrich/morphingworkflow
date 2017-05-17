@@ -1,0 +1,31 @@
+stages:
+  - name: madgraph
+    dependencies: [init]
+    scheduler:
+      scheduler_type: multistep-stage
+      parameters:
+        paramcard: {stages: init, output: paramcards, unwrap: true}
+        lhefile: '{workdir}/output.lhe'
+      step: {$ref: 'steps.yml#/madgraph'}
+      scatter:
+        method: zip
+        parameters: [paramcard]
+  - name: pythia_delphes
+    dependencies: [madgraph]
+    scheduler:
+      scheduler_type: multistep-stage
+      parameters:
+        lhefile: {stages: 'madgraph[*]', output: lhefile}
+        rootfile: '{workdir}/output.root'
+      step: {$ref: 'steps.yml#/pythia_delphes'}
+      scatter:
+        method: zip
+        parameters: [lhefile]
+  - name: analysis_merge
+    dependencies: [pythia_delphes]
+    scheduler:
+      scheduler_type: singlestep-stage
+      parameters:
+        rootfiles: {stages: 'pythia_delphes[*]', output: rootfile}
+        mergedfile: '{workdir}/merged.root'
+      step: {$ref: 'steps.yml#/analysis_merge'}

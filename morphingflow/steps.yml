@@ -1,0 +1,36 @@
+madgraph:
+  process:
+    process_type: 'string-interpolated-cmd'
+    cmd: 'echo {paramcard}  > {lhefile}'
+  environment:
+    environment_type: 'docker-encapsulated'
+    image: busybox
+  publisher:
+    publisher_type: frompar-pub
+    outputmap:
+      lhefile: lhefile
+  
+
+pythia_delphes:
+  process:
+    process_type: 'string-interpolated-cmd'
+    cmd: 'echo {lhefile} > {rootfile}'
+  environment:
+    environment_type: 'docker-encapsulated'
+    image: busybox
+  publisher:
+    publisher_type: frompar-pub
+    outputmap:
+      rootfile: rootfile
+
+analysis_merge:
+  process:
+    process_type: 'string-interpolated-cmd'
+    cmd: 'echo {rootfiles} > {mergedfile}'
+  environment:
+    environment_type: 'docker-encapsulated'
+    image: busybox
+  publisher:
+    publisher_type: frompar-pub
+    outputmap:
+      mergedfile: mergedfile
